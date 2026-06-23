@@ -152,12 +152,9 @@ const stats = ref<
     { label: string; value: string; icon: any; bg: string; color: string }[]
 >([]);
 
-const chartData = ref([
-    { label: "Hadir", value: 42, percent: 85, color: "#50cd89" },
-    { label: "Sakit", value: 3, percent: 15, color: "#ffa800" },
-    { label: "Izin", value: 2, percent: 10, color: "#009ef7" },
-    { label: "Alfa", value: 1, percent: 5, color: "#f1416c" },
-]);
+const chartData = ref<
+    { label: string; value: number; percent: number; color: string }[]
+>([]);
 
 const infoSekolah = ref<{ label: string; value: string }[]>([]);
 
@@ -196,6 +193,44 @@ onMounted(async () => {
                     color: "#ffa800",
                 },
             ];
+        } catch {
+            // fallback silent
+        }
+
+        try {
+            const today = new Date().toISOString().split("T")[0];
+            const resAbsen = await apiClient.get(
+                "/absensi/rekap/harian?tanggal=" + today,
+            );
+            const absenData = resAbsen.data.data;
+            const total =
+                absenData.hadir +
+                absenData.sakit +
+                absenData.izin +
+                absenData.alfa;
+            const colors: Record<string, string> = {
+                hadir: "#50cd89",
+                sakit: "#ffa800",
+                izin: "#009ef7",
+                alfa: "#f1416c",
+            };
+            const labels: Record<string, string> = {
+                hadir: "Hadir",
+                sakit: "Sakit",
+                izin: "Izin",
+                alfa: "Alfa",
+            };
+            chartData.value = (["hadir", "sakit", "izin", "alfa"] as const).map(
+                (key) => ({
+                    label: labels[key],
+                    value: absenData[key],
+                    percent:
+                        total > 0
+                            ? Math.round((absenData[key] / total) * 100)
+                            : 0,
+                    color: colors[key],
+                }),
+            );
         } catch {
             // fallback silent
         }
