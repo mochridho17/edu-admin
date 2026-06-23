@@ -22,7 +22,10 @@ func Connect(cfg *config.Config) (*gorm.DB, error) {
 
 	// Now connect to the actual database
 	var err error
-	DB, err = gorm.Open(postgres.Open(cfg.DSN()), &gorm.Config{
+	DB, err = gorm.Open(postgres.New(postgres.Config{
+		DSN:                  cfg.DSN(),
+		PreferSimpleProtocol: true,
+	}), &gorm.Config{
 		SkipDefaultTransaction: true,
 	})
 
