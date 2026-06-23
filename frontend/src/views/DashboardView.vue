@@ -38,17 +38,6 @@
                             </el-icon>
                         </div>
                     </div>
-                    <div class="stat-footer">
-                        <span class="stat-trend" :class="stat.trend">
-                            <el-icon :size="12"
-                                ><ArrowUp
-                                    v-if="stat.trend === 'up'" /><ArrowDown
-                                    v-else
-                            /></el-icon>
-                            {{ stat.trendText }}
-                        </span>
-                        <span class="stat-period">Bulan ini</span>
-                    </div>
                 </el-card>
             </el-col>
         </el-row>
@@ -142,13 +131,12 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { useAuthStore } from "../stores/auth";
+import apiClient from "../api/client";
 import {
     UserFilled,
     School,
     Reading,
     Document,
-    ArrowUp,
-    ArrowDown,
     Check,
 } from "@element-plus/icons-vue";
 
@@ -160,44 +148,9 @@ const hariIni = new Date().toLocaleDateString("id-ID", {
     year: "numeric",
 });
 
-const stats = ref([
-    {
-        label: "Total Siswa",
-        value: "256 Siswa",
-        icon: UserFilled,
-        bg: "#e8f3ff",
-        color: "#009ef7",
-        trend: "up",
-        trendText: "+12",
-    },
-    {
-        label: "Total Kelas",
-        value: "8 Kelas",
-        icon: School,
-        bg: "#e8fff3",
-        color: "#50cd89",
-        trend: "up",
-        trendText: "+1",
-    },
-    {
-        label: "Mata Pelajaran",
-        value: "12 Mapel",
-        icon: Reading,
-        bg: "#f0e8ff",
-        color: "#7239ea",
-        trend: "up",
-        trendText: "+2",
-    },
-    {
-        label: "Rata-rata Kehadiran",
-        value: "92%",
-        icon: Document,
-        bg: "#fff4de",
-        color: "#ffa800",
-        trend: "down",
-        trendText: "-3%",
-    },
-]);
+const stats = ref<
+    { label: string; value: string; icon: any; bg: string; color: string }[]
+>([]);
 
 const chartData = ref([
     { label: "Hadir", value: 42, percent: 85, color: "#50cd89" },
@@ -210,6 +163,43 @@ const infoSekolah = ref<{ label: string; value: string }[]>([]);
 
 onMounted(async () => {
     if (!authStore.isDemoMode) {
+        try {
+            const res = await apiClient.get("/dashboard/stats");
+            const d = res.data.data;
+            stats.value = [
+                {
+                    label: "Total Siswa",
+                    value: d.total_siswa + " Siswa",
+                    icon: UserFilled,
+                    bg: "#e8f3ff",
+                    color: "#009ef7",
+                },
+                {
+                    label: "Total Kelas",
+                    value: d.total_kelas + " Kelas",
+                    icon: School,
+                    bg: "#e8fff3",
+                    color: "#50cd89",
+                },
+                {
+                    label: "Mata Pelajaran",
+                    value: d.total_mapel + " Mapel",
+                    icon: Reading,
+                    bg: "#f0e8ff",
+                    color: "#7239ea",
+                },
+                {
+                    label: "Rata-rata Kehadiran",
+                    value: d.rata_rata_kehadiran,
+                    icon: Document,
+                    bg: "#fff4de",
+                    color: "#ffa800",
+                },
+            ];
+        } catch {
+            // fallback silent
+        }
+
         try {
             const { schoolApi } = await import("../api/modules/school");
             const res = await schoolApi.getInfo();
