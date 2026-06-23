@@ -1,0 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #f0f2f5;
+  color: #333;
+}
+
+/* Element Plus overrides for cleaner look */
+.el-card {
+  border: none !important;
+  border-radius: 8px !important;
+}
+.el-card__header {
+  border-bottom: 1px solid #f0f0f0 !important;
+  padding: 16px 20px !important;
+  font-weight: 600;
+}
+
+.el-table th.el-table__cell {
+  background-color: #f8f9fa !important;
+  color: #6c757d !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+}
+
+.el-button--primary {
+  background: #009ef7 !important;
+  border-color: #009ef7 !important;
+}
+.el-button--primary:hover {
+  background: #0095e8 !important;
+  border-color: #0095e8 !important;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
