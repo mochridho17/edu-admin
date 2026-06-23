@@ -61,6 +61,8 @@ func SetupRouter() *gin.Engine {
 		// Laporan
 		auth.GET("/laporan/absensi", handler.ExportAbsensi)
 		auth.GET("/laporan/nilai", handler.ExportNilai)
+		// School Info
+		auth.GET("/school/info", handler.GetSchoolInfo)
 
 		// Super Admin routes
 		super := auth.Group("")

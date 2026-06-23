@@ -7,7 +7,7 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	Token string      `json:"token"`
+	Token string       `json:"token"`
 	User  UserResponse `json:"user"`
 }
 
@@ -113,7 +113,7 @@ type AbsensiRekapBulanan struct {
 
 // ====== Nilai ======
 type NilaiItem struct {
-	SiswaID uint    `json:"siswa_id" binding:"required"`
+	SiswaID uint     `json:"siswa_id" binding:"required"`
 	Tugas   *float64 `json:"tugas"`
 	UTS     *float64 `json:"uts"`
 	UAS     *float64 `json:"uas"`
@@ -139,20 +139,21 @@ type NilaiRekapSiswa struct {
 }
 
 type NilaiRankingKelas struct {
-	SiswaID  uint    `json:"siswa_id"`
-	NamaSiswa string `json:"nama_siswa"`
-	NIS      string `json:"nis"`
-	RataRata float64 `json:"rata_rata"`
-	Peringkat int    `json:"peringkat"`
+	SiswaID   uint    `json:"siswa_id"`
+	NamaSiswa string  `json:"nama_siswa"`
+	NIS       string  `json:"nis"`
+	RataRata  float64 `json:"rata_rata"`
+	Peringkat int     `json:"peringkat"`
 }
 
 // ====== Dashboard ======
 type DashboardStats struct {
-	TotalSiswa       int64            `json:"total_siswa"`
-	TotalKelas       int64            `json:"total_kelas"`
-	TotalMapel       int64            `json:"total_mapel"`
-	RataRataKehadiran string          `json:"rata_rata_kehadiran"`
-	AbsensiHariIni   map[string]int64 `json:"absensi_hari_ini"`
+	TotalSiswa        int64            `json:"total_siswa"`
+	TotalKelas        int64            `json:"total_kelas"`
+	TotalMapel        int64            `json:"total_mapel"`
+	RataRataKehadiran string           `json:"rata_rata_kehadiran"`
+	AbsensiHariIni    map[string]int64 `json:"absensi_hari_ini"`
+	NamaSekolah       string           `json:"nama_sekolah"` // ← TAMBAH INI
 }
 
 // ====== Generic ======
