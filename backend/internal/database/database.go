@@ -22,9 +22,18 @@ func Connect(cfg *config.Config) (*gorm.DB, error) {
 
 	// Now connect to the actual database
 	var err error
-	DB, err = gorm.Open(postgres.Open(cfg.DSN()), &gorm.Config{})
+	DB, err = gorm.Open(postgres.Open(cfg.DSN()), &gorm.Config{
+		DisablePreparedStmt: true,
+	})
+
 	if err != nil {
 		return nil, fmt.Errorf("gagal konek database: %w", err)
+	}
+
+	sqlDB, err := DB.DB()
+	if err == nil {
+		sqlDB.SetMaxOpenConns(10)
+		sqlDB.SetMaxIdleConns(2)
 	}
 
 	log.Println("✅ Database terhubung")
@@ -93,7 +102,7 @@ func Seed(db *gorm.DB) error {
 		Username: "admin",
 		Email:    "admin@sekolah.sch.id",
 		Password: string(hash),
-		Role:    "super_admin",
+		Role:     "super_admin",
 	}
 	if err := db.Create(&admin).Error; err != nil {
 		return err
