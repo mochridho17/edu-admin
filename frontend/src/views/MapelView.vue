@@ -1,100 +1,180 @@
 <template>
-  <div>
-    <el-card shadow="hover">
-      <template #header>
-        <div class="flex justify-between items-center">
-          <span>Daftar Mata Pelajaran</span>
-          <el-button type="primary" size="small" @click="openDialog()">+ Tambah Mapel</el-button>
-        </div>
-      </template>
-      <el-table :data="mapelStore.list" v-loading="mapelStore.loading" stripe style="width: 100%">
-        <el-table-column prop="kode" label="Kode" width="120" />
-        <el-table-column prop="nama" label="Nama Mapel" min-width="200" />
-        <el-table-column prop="kkm" label="KKM" width="100" />
-        <el-table-column label="Aksi" width="200" fixed="right">
-          <template #default="{ row }">
-            <el-button size="small" @click="openDialog(row)">Edit</el-button>
-            <el-button size="small" type="danger" @click="handleDelete(row.id)">Hapus</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-    </el-card>
+    <div>
+        <el-card shadow="hover">
+            <template #header>
+                <div class="flex justify-between items-center">
+                    <span>Daftar Mata Pelajaran</span>
+                    <el-button type="primary" size="small" @click="openDialog()"
+                        >+ Tambah Mapel</el-button
+                    >
+                </div>
+            </template>
+            <el-table
+                :data="pagedData"
+                v-loading="mapelStore.loading"
+                stripe
+                style="width: 100%"
+            >
+                <el-table-column prop="kode" label="Kode" width="120" />
+                <el-table-column
+                    prop="nama"
+                    label="Nama Mapel"
+                    min-width="200"
+                />
+                <el-table-column prop="kkm" label="KKM" width="100" />
+                <el-table-column label="Aksi" width="200" fixed="right">
+                    <template #default="{ row }">
+                        <el-button size="small" @click="openDialog(row)"
+                            >Edit</el-button
+                        >
+                        <el-button
+                            size="small"
+                            type="danger"
+                            @click="handleDelete(row.id)"
+                            >Hapus</el-button
+                        >
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div
+                class="flex justify-center mt-4"
+                v-if="mapelStore.list.length > pageSize"
+            >
+                <el-pagination
+                    v-model:current-page="currentPage"
+                    v-model:page-size="pageSize"
+                    :total="mapelStore.list.length"
+                    :page-sizes="[10, 20, 50]"
+                    layout="total, sizes, prev, pager, next, jumper"
+                    background
+                />
+            </div>
+        </el-card>
 
-    <el-dialog v-model="dialogVisible" :title="isEdit ? 'Edit Mapel' : 'Tambah Mapel'" width="500px">
-      <el-form ref="formRef" :model="form" :rules="rules" label-width="120px">
-        <el-form-item label="Kode" prop="kode">
-          <el-input v-model="form.kode" placeholder="Contoh: MTK-WAJIB" />
-        </el-form-item>
-        <el-form-item label="Nama" prop="nama">
-          <el-input v-model="form.nama" placeholder="Nama mata pelajaran" />
-        </el-form-item>
-        <el-form-item label="KKM" prop="kkm">
-          <el-input-number v-model="form.kkm" :min="0" :max="100" />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="dialogVisible = false">Batal</el-button>
-        <el-button type="primary" :loading="submitting" @click="handleSubmit">Simpan</el-button>
-      </template>
-    </el-dialog>
-  </div>
+        <el-dialog
+            v-model="dialogVisible"
+            :title="isEdit ? 'Edit Mapel' : 'Tambah Mapel'"
+            width="500px"
+        >
+            <el-form
+                ref="formRef"
+                :model="form"
+                :rules="rules"
+                label-width="120px"
+            >
+                <el-form-item label="Kode" prop="kode">
+                    <el-input
+                        v-model="form.kode"
+                        placeholder="Contoh: MTK-WAJIB"
+                    />
+                </el-form-item>
+                <el-form-item label="Nama" prop="nama">
+                    <el-input
+                        v-model="form.nama"
+                        placeholder="Nama mata pelajaran"
+                    />
+                </el-form-item>
+                <el-form-item label="KKM" prop="kkm">
+                    <el-input-number v-model="form.kkm" :min="0" :max="100" />
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <el-button @click="dialogVisible = false">Batal</el-button>
+                <el-button
+                    type="primary"
+                    :loading="submitting"
+                    @click="handleSubmit"
+                    >Simpan</el-button
+                >
+            </template>
+        </el-dialog>
+    </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import type { FormInstance, FormRules } from 'element-plus'
-import { useMapelStore } from '../stores/mapel'
-import type { MataPelajaranForm } from '../types'
+import { ref, reactive, computed, onMounted } from "vue";
+import { ElMessage, ElMessageBox } from "element-plus";
+import type { FormInstance, FormRules } from "element-plus";
+import { useMapelStore } from "../stores/mapel";
+import type { MataPelajaranForm } from "../types";
 
-const mapelStore = useMapelStore()
-const dialogVisible = ref(false)
-const isEdit = ref(false)
-const editingId = ref<number | null>(null)
-const submitting = ref(false)
-const formRef = ref<FormInstance>()
+const mapelStore = useMapelStore();
 
-const form = reactive<MataPelajaranForm>({ kode: '', nama: '', kkm: 75 })
+const currentPage = ref(1);
+const pageSize = ref(10);
+const pagedData = computed(() => {
+    const start = (currentPage.value - 1) * pageSize.value;
+    return mapelStore.list.slice(start, start + pageSize.value);
+});
+
+const dialogVisible = ref(false);
+const isEdit = ref(false);
+const editingId = ref<number | null>(null);
+const submitting = ref(false);
+const formRef = ref<FormInstance>();
+
+const form = reactive<MataPelajaranForm>({ kode: "", nama: "", kkm: 75 });
 const rules: FormRules = {
-  kode: [{ required: true, message: 'Kode mapel harus diisi', trigger: 'blur' }],
-  nama: [{ required: true, message: 'Nama mapel harus diisi', trigger: 'blur' }],
-  kkm: [{ required: true, message: 'KKM harus diisi', trigger: 'blur' }],
-}
+    kode: [
+        { required: true, message: "Kode mapel harus diisi", trigger: "blur" },
+    ],
+    nama: [
+        { required: true, message: "Nama mapel harus diisi", trigger: "blur" },
+    ],
+    kkm: [{ required: true, message: "KKM harus diisi", trigger: "blur" }],
+};
 
-onMounted(() => mapelStore.fetchAll())
+onMounted(() => {
+    currentPage.value = 1;
+    mapelStore.fetchAll();
+});
 
 function openDialog(row?: MataPelajaranForm & { id?: number }) {
-  if (row) {
-    isEdit.value = true; editingId.value = row.id!
-    form.kode = row.kode; form.nama = row.nama; form.kkm = row.kkm
-  } else {
-    isEdit.value = false; editingId.value = null
-    form.kode = ''; form.nama = ''; form.kkm = 75
-  }
-  dialogVisible.value = true
+    if (row) {
+        isEdit.value = true;
+        editingId.value = row.id!;
+        form.kode = row.kode;
+        form.nama = row.nama;
+        form.kkm = row.kkm;
+    } else {
+        isEdit.value = false;
+        editingId.value = null;
+        form.kode = "";
+        form.nama = "";
+        form.kkm = 75;
+    }
+    dialogVisible.value = true;
 }
 
 async function handleSubmit() {
-  const valid = await formRef.value?.validate().catch(() => false)
-  if (!valid) return
-  submitting.value = true
-  try {
-    if (isEdit.value && editingId.value) {
-      await mapelStore.update(editingId.value, form)
-      ElMessage.success('Mapel berhasil diupdate')
-    } else {
-      await mapelStore.create(form)
-      ElMessage.success('Mapel berhasil ditambahkan')
+    const valid = await formRef.value?.validate().catch(() => false);
+    if (!valid) return;
+    submitting.value = true;
+    try {
+        if (isEdit.value && editingId.value) {
+            await mapelStore.update(editingId.value, form);
+            ElMessage.success("Mapel berhasil diupdate");
+        } else {
+            await mapelStore.create(form);
+            ElMessage.success("Mapel berhasil ditambahkan");
+        }
+        dialogVisible.value = false;
+    } finally {
+        submitting.value = false;
     }
-    dialogVisible.value = false
-  } finally { submitting.value = false }
 }
 
 async function handleDelete(id: number) {
-  try {
-    await ElMessageBox.confirm('Yakin ingin menghapus mapel ini?', 'Konfirmasi', { type: 'warning' })
-    await mapelStore.remove(id)
-    ElMessage.success('Mapel berhasil dihapus')
-  } catch { /* cancelled */ }
+    try {
+        await ElMessageBox.confirm(
+            "Yakin ingin menghapus mapel ini?",
+            "Konfirmasi",
+            { type: "warning" },
+        );
+        await mapelStore.remove(id);
+        ElMessage.success("Mapel berhasil dihapus");
+    } catch {
+        /* cancelled */
+    }
 }
 </script>

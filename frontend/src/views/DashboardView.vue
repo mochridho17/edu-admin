@@ -7,16 +7,6 @@
                     Halo, <strong>{{ authStore.user?.username }}</strong
                     >! Selamat datang kembali.
                 </h3>
-                <p class="welcome-sub">
-                    {{ hariIni }}
-                    <el-tag
-                        v-if="authStore.isDemoMode"
-                        type="warning"
-                        size="small"
-                        class="ml-2"
-                        >🧪 Mode Demo</el-tag
-                    >
-                </p>
             </div>
         </div>
 

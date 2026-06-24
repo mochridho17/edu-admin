@@ -59,8 +59,16 @@ func SetupRouter() *gin.Engine {
 		auth.GET("/nilai/rekap/kelas", handler.RankingKelas)
 
 		// Laporan
+		// Jurnal Guru
+		auth.GET("/jurnal-guru", handler.GetJurnalGuru)
+		auth.POST("/jurnal-guru", handler.CreateJurnalGuru)
+		auth.PUT("/jurnal-guru/:id", handler.UpdateJurnalGuru)
+		auth.DELETE("/jurnal-guru/:id", handler.DeleteJurnalGuru)
+
+		// Laporan
 		auth.GET("/laporan/absensi", handler.ExportAbsensi)
 		auth.GET("/laporan/nilai", handler.ExportNilai)
+		auth.GET("/laporan/jurnal-guru", handler.ExportJurnalGuru)
 		// School Info
 		auth.GET("/school/info", handler.GetSchoolInfo)
 

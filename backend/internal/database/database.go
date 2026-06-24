@@ -80,6 +80,7 @@ func Migrate(db *gorm.DB) error {
 		&model.MataPelajaran{},
 		&model.Absensi{},
 		&model.Nilai{},
+		&model.JurnalGuru{},
 	)
 	if err != nil {
 		return fmt.Errorf("gagal migrasi: %w", err)

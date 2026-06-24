@@ -156,6 +156,27 @@ type DashboardStats struct {
 	NamaSekolah       string           `json:"nama_sekolah"` // ← TAMBAH INI
 }
 
+// ====== Jurnal Guru ======
+type CreateJurnalRequest struct {
+	Tanggal       string `json:"tanggal" binding:"required"`
+	NamaGuru      string `json:"nama_guru" binding:"required"`
+	MapelID       uint   `json:"mapel_id" binding:"required"`
+	KelasID       uint   `json:"kelas_id" binding:"required"`
+	Kegiatan      string `json:"kegiatan" binding:"required"`
+	Semester      string `json:"semester" binding:"required"`
+	TahunAjaranID uint   `json:"tahun_ajaran_id" binding:"required"`
+}
+
+type UpdateJurnalRequest struct {
+	Tanggal       string `json:"tanggal"`
+	NamaGuru      string `json:"nama_guru"`
+	MapelID       uint   `json:"mapel_id"`
+	KelasID       uint   `json:"kelas_id"`
+	Kegiatan      string `json:"kegiatan"`
+	Semester      string `json:"semester"`
+	TahunAjaranID uint   `json:"tahun_ajaran_id"`
+}
+
 // ====== Generic ======
 type ApiResponse struct {
 	Success bool        `json:"success"`
